@@ -44,30 +44,16 @@ Day 1: Apr 12, 2016
 Day 2: Apr 26, 2016
 ===================
 
- * 가상화란? (김현지)
-
-   * 
-   
- * Hardware virtualization (김제삼)
-
-   *
-   
+ * `가상화란? (김현지) <20160426/01_가상화란_김현지_v0.1.pdf>`_
+ * `Hardware virtualization (김제삼) <20160426/02_OpenStack_Study_A-Hardware%20Virtualization-JS_KIM.pdf>`_
  * Network namespace 개요 (이장진)
- 
-   *
-   *
+
+   * `개요 <20160426/03-1_Network%20Namespace%20개요.pdf>`_
+   * `실습 결과 <20160426/03-2_Network%20Namespace%20실습결과.pdf>`_
    
- * OpenvSwitch (김기덕)
- 
-   *
-   
- * OpenvSwitch 실습 (김홍규)
-   
-   * 
-   
- * VM을 위한 I/O 가속 (이상훈)
- 
-   *
+ * `OpenvSwitch (김기덕) <20160426/04_Open%20vSwitch_ClassA_KKD.pdf>`_
+ * `OpenvSwitch 실습 (김홍규) <20160426/05_Open%20v%20switch%20실습.pptx>`_
+ * `VM을 위한 I/O 가속 (이상훈) <20160426/06_160426%20OpenStack%20Study%20-%20IO%20Acceleration%20for%20Virtualization%20Infrastructure%20rev%200.9.pdf>`_
 
 Day 3: May 10, 2016
 ===================
