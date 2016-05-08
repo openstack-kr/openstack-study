@@ -12,21 +12,32 @@ Recommended References
 ======================
 
  * (OpenStack 설치 가이드 (Liberty) 한글 [draft] SUSE 계열
-   : http://docs.openstack.org/liberty/ko_KR/install-guide-obs/
+ 
+   * http://docs.openstack.org/liberty/ko_KR/install-guide-obs/
+   
  * OpenStack 설치 가이드 (Liberty) 한글 [draft] Redhat 계열
-   : http://docs.openstack.org/liberty/ko_KR/install-guide-rdo/
+ 
+   * http://docs.openstack.org/liberty/ko_KR/install-guide-rdo/
+   
  * OpenStack 설치 가이드 (Liberty) 한글 [draft] Ubuntu 계열
-   : http://docs.openstack.org/liberty/ko_KR/install-guide-ubuntu/
+ 
+   * http://docs.openstack.org/liberty/ko_KR/install-guide-ubuntu/
+   
  * 업스트림 트레이닝 한글 자료
-   : http://docs.openstack.org/ko_KR/upstream-training/
+
+   * http://docs.openstack.org/ko_KR/upstream-training/
+   
  * OpenStack Networking 피피티 자료
-   : http://www.slideshare.net/openstack_kr/openstack-networking-51058538
+
+   * http://www.slideshare.net/openstack_kr/openstack-networking-51058538
 
 Day 1: Apr 12, 2016
 ===================
 
  * OpenStack 개요 및 활용 사례 (최영락)
-   : http://www.slideshare.net/ianychoi/openstack-community-open-camp-with-microsoft-60761407
+ 
+   * http://www.slideshare.net/ianychoi/openstack-community-open-camp-with-microsoft-60761407
+   
  * ip & Linux Bridge (이병희)
  * git 소개 (최영락)
 
@@ -34,18 +45,29 @@ Day 2: Apr 26, 2016
 ===================
 
  * 가상화란? (김현지)
-   : 
+
+   * 
+   
  * Hardware virtualization (김제삼)
-   : 
+
+   *
+   
  * Network namespace 개요 (이장진)
-   :
-   :
+ 
+   *
+   *
+   
  * OpenvSwitch (김기덕)
-   :
+ 
+   *
+   
  * OpenvSwitch 실습 (김홍규)
-   :
+   
+   * 
+   
  * VM을 위한 I/O 가속 (이상훈)
-   :
+ 
+   *
 
 Day 3: May 10, 2016
 ===================
