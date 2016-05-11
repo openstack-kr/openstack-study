@@ -1,0 +1,283 @@
+
+NEW RDO Setup
+
+Node 2개 
+RDO_controller
+  nic 1 : 10.1.0.11 hostonly
+  nic 2 : 203.0.113.11 hostonly
+  nic 3 : dhcp NAT
+RDO_compute1
+  nic 1 : 10.1.0.31 hostonly
+  nic 2 : 203.0.113.31 hostonly
+  nic 3 : dhcp NAT
+
+======================================================================================
+network setup
+[node 1]
+* nic 1
+/etc/sysconfig/network-scripts/ifcfg-enp0s3
+-------------------------------------------------
+TYPE=Ethernet
+BOOTPROTO=static
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=no
+NAME=enp0s3
+DEVICE=enp0s3
+ONBOOT=yes
+IPADDR=10.1.0.11
+#GATEWAY=10.1.0.1
+PREFIX=24
+
+* nic 2
+cat << EOF > /etc/sysconfig/network-scripts/ifcfg-enp0s8
+DEVICE=enp0s8
+TYPE=Ethernet
+ONBOOT="yes"
+BOOTPROTO="none"
+EOF
+
+[node 2]
+* nic 1
+/etc/sysconfig/network-scripts/ifcfg-enp0s3
+-------------------------------------------------
+TYPE=Ethernet
+BOOTPROTO=static
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=no
+NAME=enp0s3
+DEVICE=enp0s3
+ONBOOT=yes
+IPADDR=10.1.0.31
+#GATEWAY=10.1.0.1
+PREFIX=24
+
+* nic 2
+/etc/sysconfig/network-scripts/ifcfg-enp0s8
+DEVICE=enp0s8
+TYPE=Ethernet
+ONBOOT="yes"
+BOOTPROTO="none"
+
+========================================================================================
+HOST name 등록
+
+$ sudo hostnamectl set-hostname controller
+$ sudo systemctl restart systemd-hostnamed
+
+
+$ sudo hostnamectl set-hostname compute1
+$ sudo systemctl restart systemd-hostnamed
+
+cat << EOF >> /etc/hosts
+
+10.1.0.11    controller
+10.1.0.31    compute1
+
+EOF
+
+=======================================================================================
+# selinux
+vi /etc/selinux/config
+------------------------------------
+SELINUX=disabled
+------------------------------------
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+
+========================================================================================
+DISABLE NetworkManager
+
+
+systemctl stop NetworkManager
+systemctl disable NetworkManager
+systemctl restart network
+
+
+========================================================================================
+SUDO Enable
+vi /etc/sudoers
+-------------------------------------
+student ALL=(ALL)       ALL
+-------------------------------------
+
+cat << EOF >> /etc/sudoers
+
+student ALL=(ALL)       ALL
+EOF
+
+
+sudo yum -y install crudini
+
+========================================================================================
+install RDO
+Single node
+----------------------------------------
+student user로 login
+
+$ sudo yum install -y https://www.rdoproject.org/repos/rdo-release.rpm
+$ sudo yum update -y
+$ sudo yum install -y openstack-packstack
+$ packstack --allinone
+----------------------------------------
+
+
+Multi node
+-----------------------------------------
+student user로 login
+
+# Kilo설치 하려면....
+sudo yum install -y https://rdoproject.org/repos/openstack-kilo/rdo-release-kilo.rpm
+
+# Liberty 설치 하려면....
+sudo yum install -y https://rdoproject.org/repos/openstack-liberty/rdo-release-liberty.rpm
+
+sudo yum update -y
+sudo yum install -y openstack-packstack
+
+mkdir rdo
+sudo packstack --gen-answer-file ~/rdo/my_2node_answer.txt
+
+packstack \
+--install-hosts=10.1.0.11
+--provision-demo=n  \
+--nagios-install=n \
+--os-ceilometer-install=n \
+--os-neutron-ml2-type-drivers=vxlan,flat,vlan \
+--gen-answer-file=~/rdo/my_2node_answer.txt
+
+
+# sudo chown student:student ~/rdo/my_2node_answer.txt
+
+========================================================================================
+Install CRUD INI
+
+sudo yum -y install crudini
+
+Edit my_2node_answer.txt
+-----------------------------------------
+crudini 
+
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_CONTROLLER_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_COMPUTE_HOSTS 10.1.0.31
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NETWORK_HOSTS 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_STORAGE_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_SAHARA_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_AMQP_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_MARIADB_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_KEYSTONE_LDAP_URL ldap://10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_MONGODB_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_REDIS_MASTER_HOST 10.1.0.11
+
+
+CONFIG_CONTROLLER_HOST=10.1.0.11
+CONFIG_COMPUTE_HOSTS=10.1.0.31
+CONFIG_NETWORK_HOSTS=10.1.0.11
+
+CONFIG_NOVA_NETWORK_PUBIF=enp0s8
+CONFIG_KEYSTONE_ADMIN_PW=37f9114f75bd484a
+
+sudo sed -i 's/10.0.4.15/10.1.0.11/g' ~/rdo/my_2node_answer.txt
+
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_COMPUTE_HOSTS 10.1.0.31
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_STORAGE_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_SAHARA_HOST 10.1.0.11
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_KEYSTONE_LDAP_URL ldap://10.1.0.11
+
+
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NOVA_COMPUTE_PRIVIF enp0s3
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NOVA_NETWORK_PUBIF enp0s8
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NOVA_NETWORK_PRIVIF enp0s3
+
+grep PW my_2node_answer.txt | grep -v PLACEHOLDER
+
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_KEYSTONE_ADMIN_PW pass_for_admin
+
+Set Passwd
+-----------------------------------------
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_MARIADB_PW pass_for_db
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_KEYSTONE_DB_PW pass_for_db_keystone
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_KEYSTONE_ADMIN_PW pass_for_admin
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_KEYSTONE_DEMO_PW pass_for_demo
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_GLANCE_DB_PW pass_for_db_glance
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_GLANCE_KS_PW pass_for_glance
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_CINDER_DB_PW pass_for_db_cinder
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_CINDER_KS_PW pass_for_cinder
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NOVA_DB_PW pass_for_db_nova
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NOVA_KS_PW pass_for_nova
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NEUTRON_KS_PW pass_for_neutron
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NEUTRON_DB_PW pass_for_db_neutron
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NEUTRON_METADATA_PW pass_for_metadate_neutron
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_SWIFT_KS_PW pass_for_swift
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_CEILOMETER_KS_PW pass_for_ceilo
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_NAGIOS_PW pass_for_db_ceilo
+
+No Demo network
+-----------------------------------------
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_PROVISION_DEMO n
+# crudini --set ~/rdo/my_2node_answer.txt general CONFIG_SWIFT_INSTALL n
+crudini --set ~/rdo/my_2node_answer.txt general CONFIG_CEILOMETER_INSTALL n
+
+sudo packstack --answer-file  ~/rdo/my_2node_answer.txt
+
+
+
+vi /etc/cinder/cinder.conf
+----------------------------------------
+[keystone_authtoken]
+auth_uri = http://<Controller_IP>:5000
+auth_url = http://<Controller_IP>:35357
+auth_plugin = password
+project_domain_id = default 
+user_domain_id = default 
+project_name = services 
+username = cinder 
+password = <Cinder_Password>
+----------------------------------------
+crudini --set /etc/cinder/cinder.conf keystone_authtoken auth_uri http://10.1.0.11:5000
+crudini --set /etc/cinder/cinder.conf keystone_authtoken auth_url http://10.1.0.11:35357
+crudini --set /etc/cinder/cinder.conf keystone_authtoken auth_plugin password
+crudini --set /etc/cinder/cinder.conf keystone_authtoken project_domain_id default 
+crudini --set /etc/cinder/cinder.conf keystone_authtoken user_domain_id default 
+crudini --set /etc/cinder/cinder.conf keystone_authtoken project_name services 
+crudini --set /etc/cinder/cinder.conf keystone_authtoken username cinder 
+crudini --set /etc/cinder/cinder.conf keystone_authtoken password pass_for_cinder
+
+systemctl restart openstack-cinder-volume 
+
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 type_drivers flat,gre,vxlan,local
+
+systemctl restart neutron-server
+
+
+=============================================================
+VBoxManage controlvm RDO_controller poweroff
+VBoxManage unregistervm RDO_controller --delete
+
+VBoxManage controlvm RDO_compute1 poweroff
+VBoxManage unregistervm RDO_compute1 --delete
+
+
+VBoxManage import ~/ova/RDO_controller.ova
+VBoxManage import ~/ova/RDO_compute1.ova
+
+VBoxManage modifyvm RDO_controller --groups /RDO
+VBoxManage modifyvm RDO_compute1 --groups /RDO
+
+VBoxManage startvm RDO_controller  --type headless
+VBoxManage startvm RDO_compute1  --type headless
+
+
+============================================================
+controller node shutdown시에 
+dracut shutdown loop running error - CentOS-7
+
+해결책은 
+systemctl mask dracut-shutdown.service
+근데 너무 빨리 끝난다...ㅠㅠ
+
+

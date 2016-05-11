@@ -76,6 +76,10 @@ Day 2: Apr 14, 2016
    * 권영부: (업데이트 예정) 
    * 박준상: (업데이트 예정)
 
+ * 참고 자료
+
+   * nicholas, `Installation Guide for OpenStack Kilo MultiNode + Docker <https://www.evernote.com/shard/s15/sh/a96599f5-6b07-4db7-9396-2658261fa411/5c209a6dcf7459fbc57dea9e3ec1ed72>`_
+
 Day 3: Apr 21, 2016
 ===================
 
@@ -85,8 +89,13 @@ Day 3: Apr 21, 2016
 
  * 자료
 
-   * 성호찬: (업데이트 예정)
+   * 성호찬: `발표 자료 <materials/20160509_sunh.docx>`_
    * 최광훈: (업데이트 예정)
+
+ * 참고 자료
+
+   * codetree, `rdo_multi_node_setup_study.txt <materials/rdo_multi_node_setup_study.txt>`_
+   * ianychoi, `Chapter 4 부분 설명 (책 내용 참고) <materials/20160421_ianychoi.pdf>`_
 
 Day 4: Apr 28, 2016
 ===================
@@ -97,7 +106,13 @@ Day 4: Apr 28, 2016
 
  * 자료
 
-   * 장지태: (업데이트 예정)
+   * 장지태: `발표 자료 <materials/20160428_jtjang.pptm>`_
+
+ * 참고 자료
+
+   * wikitree, `VLAN <https://wikibootup.gitbooks.io/network/content/vlan.html>`_
+   * heavenkong, `[Resolved] Mitaka Linux Bridge Agent Error Linux Bridge Agent out of sync with plugin !
+     <http://heavenkong.blogspot.kr/2016/04/resolved-mitaka-linux-bridge-agent.html>`_
 
 Day 5: May 12, 2016
 ===================
