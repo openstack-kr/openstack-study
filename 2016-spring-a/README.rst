@@ -58,6 +58,15 @@ Day 2: Apr 26, 2016
 Day 3: May 10, 2016
 ===================
 
+ * `DevStack이란? (김신규) <20160510/01_DevStack이란.pdf>`_
+   (`pptx 원본 <20160510/01_DevStack이란.pptx>`_)
+ * `DevStack 설치 - Neutron (김일) <20160510/02_Neutron_install_김일.pdf>`_
+ * `DevStack 설치 - nova-network (명진) <20160510/03_DevStack설치_Nova-Network_160510.pdf>`_
+   (`pptx 원본 <20160510/03_DevStack설치_Nova-Network_160510.pptx>`_)
+ * `DevStack - localrc와 local.conf 차이 (조성수) <20160510/04_devstack_localrc_local_conf_differences.pdf>`_
+ * `고가용성 개요 (서평호) <20160510/05_HA_서평호_ver0.1.pdf>`_
+   (`pptx 원본 <20160510/05_HA_서평호_ver0.1.pptx>`_)
+
 Day 4: May 24, 2016
 ===================
 
