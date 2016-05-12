@@ -1,0 +1,60 @@
+== Installing Neutron ==
+
+apt-get install neutron-plugin-ml2
+
+## BEGIN updates to /etc/neutron/neutron.conf 
+
+[database]
+connection = mysql://neutron:neutron@controller01/neutron
+
+[DEFAULT]
+core_plugin = ml2
+auth_strategy = keystone
+rpc_backend = rabbit
+
+[keystone_authtoken]
+auth_uri = http://controller01:5000
+auth_url = http://controller01:35357 
+auth_plugin = password 
+project_domain_id = default 
+user_domain_id = default 
+project_name = service
+username = neutron
+password = neutron
+
+[oslo_messaging_rabbit] 
+rabbit_host = controller01 
+rabbit_userid = openstack 
+rabbit_password = rabbit
+
+
+## END updates to /etc/neutron/neutron.conf 
+
+## BEGIN updates to /etc/sysctl.conf
+
+net.ipv4.ip_forward = 1 
+net.ipv4.conf.default.rp_filter = 0 
+net.ipv4.conf.all.rp_filter = 0
+
+## END updates to /etc/sysctl.conf
+
+sysctl -p
+
+## BEGIN updates to /etc/nova/nova.conf
+
+[DEFAULT]
+network_api_class = nova.network.neutronv2.api.API
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+security_group_api = neutron
+
+[neutron]
+url = http://controller01:9696
+auth_strategy = keystone
+admin_tenant_name = service
+admin_username = neutron
+admin_password = neutron
+admin_auth_url = http://controller01:35357/v2.0
+
+## END updates to /etc/nova/nova.conf
+
+service nova-compute restart

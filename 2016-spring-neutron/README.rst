@@ -1,7 +1,7 @@
 2016년 상반기 B반: Neutron 스터디
 +++++++++++++++++++++++++++++++++
 
-This repository contains study data that was used to learn
+This repository contains study data that has been used to learn
 OpenStack Neutron in Korea user group as study activities.
 
 스터디 개요 (Overview)
@@ -11,7 +11,7 @@ OpenStack Neutron in Korea user group as study activities.
 
  * 진행 방식 :
 
-   * 아래 각 Chapter별로 1주차 분량으로 진행 + 추가 ( 스터디 멤버와 협의후 선정 )
+   * 아래 각 Chapter 별로 1주차 분량으로 진행 + 추가 ( 스터디 멤버와 협의후 선정 )
 
      * 매주 전체 멤버는 해당 Chapter의 내용을 완료한후 Offline 스터디에 참여하여야 함.
      * 각 멤버는 매주 해당 내용에 대해서 1명씩 발표
@@ -19,7 +19,7 @@ OpenStack Neutron in Korea user group as study activities.
 
    * PACKT Learning OpenStack Networking(Neutron)
 
-     * (한글제목: 클라우드 네트워크 인프라 구축을 위한 Neutron 오픈스택 네트워킹)
+     * (한글 제목: 클라우드 네트워크 인프라 구축을 위한 Neutron 오픈스택 네트워킹)
 
    * 내용
      
@@ -53,7 +53,7 @@ Day 1: Apr 7, 2016
 
  * 다음 주까지 준비 사항
 
-   * 책 1장-3장까지 살펴보고
+   * 책 1-3장까지 살펴보고
    * Kilo 기준으로, All-in-one + Compute node 추가 설치합니다.
 
  * 발표 관련
@@ -68,13 +68,19 @@ Day 2: Apr 14, 2016
 
  * 내용
 
+   * Chapter 1. Preparing the Network for OpenStack
    * Chapter 2. Installing OpenStack
    * Chapter 3. Installing Neutron
 
  * 자료
 
    * 권영부: (업데이트 예정) 
-   * 박준상: (업데이트 예정)
+   * 박준상
+
+     * `발표 자료 <materials/20160414-jspark-chapter1_and_2.pdf>`_
+       (`pptx 원본 <materials/20160414-jspark-chapter1_and_2.pptx>`_)
+     * `책 소스 코드 수정 <materials/20160414-jspark-book_2nd_modified_codes>`_
+       (`압축 파일 <materials/20160414-jspark-book_2nd_modified_codes.zip>`_)
 
  * 참고 자료
 
@@ -89,7 +95,8 @@ Day 3: Apr 21, 2016
 
  * 자료
 
-   * 성호찬: `발표 자료 <materials/20160509_sunh.docx>`_
+   * 성호찬: `발표 자료 <materials/20160509_sunh.pdf>`_
+     (`docx 원본 <materials/20160509_sunh.docx>`_)
    * 최광훈: (업데이트 예정)
 
  * 참고 자료
@@ -106,7 +113,8 @@ Day 4: Apr 28, 2016
 
  * 자료
 
-   * 장지태: `발표 자료 <materials/20160428_jtjang.pptm>`_
+   * 장지태: `발표 자료 <materials/20160428_jtjang.pdf>`_
+     (`pptm 원본 <materials/20160428_jtjang.pptm>`_)
 
  * 참고 자료
 
@@ -123,22 +131,51 @@ Day 5: May 12, 2016
 
  * 자료
 
-   * (업데이트 예정)
+   * 이재상: (업데이트 예정)
+   * 박진산: (업데이트 예정)
+   * 이석원: (업데이트 예정)
+
+ * 참고 자료
+
+   * jspark's 추천: `버추얼박스 네트워크 이해 완벽 가이드 <http://solatech.tistory.com/277>`_
+   * nova 명령어 (python-novaclient): http://docs.openstack.org/developer/python-novaclient/
+   * neutron 명령어 (python-neutronclient): http://docs.openstack.org/developer/python-neutronclient/
+   * openstack 명령어 (python-openstackclient): http://docs.openstack.org/developer/python-openstackclient/
 
 Day 6: May 19, 2016
 ===================
 
+ * 내용
+
+   * Chapter 7. Load Balancing Traffic in Neutron
+
 Day 7: May 26, 2016
 ===================
+
+ * 내용
+
+   * Chapter 8. Protecting Instances on the Network
 
 Day 8: Jun 2, 2016
 ==================
 
+ * 내용
+
+   * (추후 업데이트 예정)
+
 Day 9: Jun 9, 2016
 ==================
 
+ * 내용
+
+   * (추후 업데이트 예정)
+
 Day 10: Jun 16, 2016
 ====================
+
+ * 내용
+
+   * (추후 업데이트 예정)
 
 Contributing
 ============

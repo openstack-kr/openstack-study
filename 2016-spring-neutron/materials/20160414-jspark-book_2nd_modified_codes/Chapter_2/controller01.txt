@@ -1,0 +1,373 @@
+= Initial Steps =
+
+apt-get update
+apt-get install ubuntu-cloud-keyring
+
+cat > /etc/apt/sources.list.d/cloudarchive-kilo.list <<EOF
+deb http://ubuntu-cloud.archive.canonical.com/ubuntu trusty-updates/kilo main
+EOF
+
+apt-get install crudini curl
+hostnamectl set-hostname controller01.learningneutron.com
+
+## BEGIN updates to /etc/hosts:
+
+10.254.254.100 controller01.learningneutron.com controller01 
+10.254.254.101 compute01.learningneutron.com compute01 
+10.254.254.102 compute02.learningneutron.com compute02
+
+## END Set /etc/hosts
+
+apt-get install ntp
+apt-get update
+apt-get dist-upgrade
+reboot
+
+
+== Installing MySQL ==
+
+apt-get install mariadb-server python-mysqldb
+
+## BEGIN updates to /etc/mysql/conf.d/mysqld_openstack.cnf
+
+[mysqld]
+bind-address = 10.254.254.100
+default-storage-engine = innodb 
+innodb_file_per_table 
+collation-server = utf8_general_ci 
+init-connect = "SET NAMES utf8" 
+character-set-server = utf8
+
+## END updates to /etc/mysql/conf.d/mysqld_openstack.cnf
+
+service mysql restart
+mysql_secure_installation
+
+== Installing RabbitMQ ==
+
+apt-get install rabbitmq-server
+rabbitmqctl add_user openstack rabbit
+rabbitmqctl set_permissions openstack ".*" ".*" ".*"
+
+== Installing Keystone ==
+
+echo "manual" > /etc/init/keystone.override
+apt-get install keystone python-openstackclient apache2 libapache2-mod-wsgi memcached python-memcache
+
+## BEGIN updates to /etc/keystone/keystone.conf
+
+[DEFAULT]
+admin_token = insecuretoken123
+
+[database]
+connection = mysql://keystone:keystone@controller01/keystone
+
+[memcache]
+servers = localhost:11211
+
+[token]
+provider = keystone.token.providers.uuid.Provider
+driver = keystone.token.persistence.backends.memcache.Token 
+[revoke]
+driver = keystone.contrib.revoke.backends.sql.Revoke
+
+
+## END updates to /etc/keystone/keystone.conf
+
+rm -f /var/lib/keystone/keystone.db
+
+mysql -u root -p
+
+## Once in MySQL, run the following:
+CREATE DATABASE keystone;
+GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY 'keystone';
+GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY 'keystone';
+quit;
+
+su -s /bin/sh -c "keystone-manage db_sync" keystone
+
+== Configuring Apache ==
+
+sed -i '1s/^/ServerName controller01\n&/' /etc/apache2/apache2.conf
+
+cat >> /etc/apache2/sites-available/wsgi-keystone.conf <<EOF 
+Listen 5000
+Listen 35357
+
+<VirtualHost *:5000>
+  WSGIDaemonProcess keystone-public processes=5 threads=1 user=keystone display-name=%{GROUP}
+  WSGIProcessGroup keystone-public
+  WSGIScriptAlias / /var/www/cgi-bin/keystone/main 
+  WSGIApplicationGroup %{GLOBAL} 
+  WSGIPassAuthorization On
+  <IfVersion >= 2.4>
+    ErrorLogFormat "%{cu}t %M"
+  </IfVersion>
+  LogLevel info
+  ErrorLog /var/log/apache2/keystone-error.log
+  CustomLog /var/log/apache2/keystone-access.log combined
+</VirtualHost>
+
+<VirtualHost *:35357>
+  WSGIDaemonProcess keystone-admin processes=5 threads=1 user=keystone display-name=%{GROUP}
+  WSGIProcessGroup keystone-admin
+  WSGIScriptAlias / /var/www/cgi-bin/keystone/admin 
+  WSGIApplicationGroup %{GLOBAL} 
+  WSGIPassAuthorization On
+  <IfVersion >= 2.4>
+    ErrorLogFormat "%{cu}t %M"
+  </IfVersion>
+  LogLevel info
+  ErrorLog /var/log/apache2/keystone-error.log
+  CustomLog /var/log/apache2/keystone-access.log combined
+</VirtualHost> 
+EOF
+
+ln -s /etc/apache2/sites-available/wsgi-keystone.conf /etc/apache2/sites-enabled
+
+mkdir -p /var/www/cgi-bin/keystone
+curl http://git.openstack.org/cgit/openstack/keystone/plain/httpd/keystone.py?h=stable/kilo | tee /var/www/cgi-bin/keystone/main /var/www/cgi-bin/keystone/admin
+
+chown -R keystone:keystone /var/www/cgi-bin/keystone 
+chmod 755 /var/www/cgi-bin/keystone/*
+
+service apache2 restart
+
+== Keystone Endpoints ==
+
+export OS_TOKEN=insecuretoken123
+export OS_URL=http://controller01:35357/v2.0
+
+openstack service create --name keystone --description "OpenStack Identity" identity
+
+openstack endpoint create \
+--publicurl http://controller01:5000/v2.0 \
+--internalurl http://controller01:5000/v2.0 \
+--adminurl http://controller01:35357/v2.0 \
+--region RegionOne \
+identity
+
+openstack project create --description "Admin Project" admin
+openstack project create --description "Service Project" service 
+openstack project create --description "Demo Project" demo
+
+openstack user create admin --password=secrete
+openstack role create admin
+
+openstack role add --project admin --user admin admin
+openstack user create demo --password=demo
+openstack role create user
+openstack role add --project demo --user demo user
+
+== Verifying Keystone ==
+
+unset OS_TOKEN OS_URL
+openstack --os-auth-url http://controller01:35357 --os-project-name admin --os-username admin --os-password secrete token issue
+openstack --os-auth-url http://controller01:35357 --os-project-name admin --os-username admin --os-password secrete project list
+
+== Set Vars ==
+
+cat >> ~/adminrc <<EOF
+export OS_PROJECT_DOMAIN_ID=default
+export OS_USER_DOMAIN_ID=default
+export OS_PROJECT_NAME=admin
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=secrete
+export OS_AUTH_URL=http://controller01:35357/v3 
+export LC_ALL=en_US.UTF-8   <=== added for local env
+EOF
+
+cat >> ~/demorc <<EOF
+export OS_PROJECT_DOMAIN_ID=default
+export OS_USER_DOMAIN_ID=default
+export OS_PROJECT_NAME=demo
+export OS_TENANT_NAME=demo
+export OS_USERNAME=demo
+export OS_PASSWORD=demo
+export OS_AUTH_URL=http://controller01:5000/v3 
+export LC_ALL=en_US.UTF-8   <=== added for local env
+EOF
+
+source ~/adminrc
+openstack user list
+
+== Installing Glance ==
+
+apt-get install glance python-glanceclient
+rm -f /var/lib/glance/glance.sqlite
+
+mysql -u root -p
+
+## Once in MySQL, run the following:
+CREATE DATABASE glance;
+GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'glance';
+GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'glance';
+quit;
+
+## BEGIN changes to /etc/glance/glance-api.conf
+
+[database]
+connection = mysql://glance:glance@controller01/glance
+
+[keystone_authtoken]
+auth_uri = http://controller01:5000/v2.0 
+auth_url = http://controller01:35357 
+auth_plugin = password
+user_domain_id = default 
+project_domain_id = default
+project_name = service
+username = glance
+password = glance
+
+[paste_deploy] 
+flavor = keystone
+
+[glance_store]
+default_store = file
+filesystem_store_datadir = /var/lib/glance/images
+
+[DEFAULT] 
+notification_driver = noop
+
+
+## END changes to /etc/glance/glance-api.conf
+
+## BEGIN changes to /etc/glance/glance-registry.conf
+
+[database]
+connection = mysql://glance:glance@controller01/glance
+
+[keystone_authtoken]
+auth_uri = http://controller01:5000/v2.0 
+auth_url = http://controller01:35357 
+auth_plugin = password
+user_domain_id = default 
+project_domain_id = default
+project_name = service
+username = glance
+password = glance
+
+[paste_deploy] 
+flavor = keystone
+
+[DEFAULT] 
+notification_driver = noop
+
+## END changes to /etc/glance/glance-registry.conf
+
+openstack user create --password glance glance
+openstack role add --project service --user glance admin
+
+su -s /bin/sh -c "glance-manage db_sync" glance
+service glance-registry restart 
+service glance-api restart
+
+== Glance endpoints ==
+
+openstack service create --name glance --description "OpenStack Image service" image
+
+openstack endpoint create --publicurl http://controller01:9292 --internalurl http://controller01:9292 --adminurl http://controller01:9292 --region RegionOne image
+
+echo "export OS_IMAGE_API_VERSION=2" | tee -a ~/adminrc ~/demorc
+source ~/adminrc
+
+mkdir /tmp/images
+wget -P /tmp/images http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
+
+glance image-create --name "cirros-0.3.4-x86_64" --file /tmp/images/cirros-0.3.4-x86_64-disk.img --disk-format qcow2 --container-format bare --visibility public --progress
+
+glance image-list
+
+wget -P /tmp/images https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
+
+glance image-create --name "Ubuntu 14.04 LTS Cloud Image" --file /tmp/images/trusty-server-cloudimg-amd64-disk1.img --disk-format qcow2 --container-format bare --visibility public --progress
+
+
+== Installing Compute ==
+
+apt-get install nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient
+
+rm -f /var/lib/nova/nova.sqlite
+
+mysql -u root -p
+
+## Once in MySQL, run the following:
+CREATE DATABASE nova;
+GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'nova';
+GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'nova'; 
+quit;
+
+## BEGIN updates to /etc/nova/nova.conf
+
+[database]
+connection = mysql://nova:nova@controller01/nova
+
+[DEFAULT] 
+rpc_backend = rabbit
+my_ip = 10.254.254.100
+vncserver_listen = 10.254.254.100 
+vncserver_proxyclient_address = 10.254.254.100
+auth_strategy = keystone
+
+[oslo_messaging_rabbit] 
+rabbit_host = controller01 
+rabbit_userid = openstack 
+rabbit_password = rabbit
+
+[keystone_authtoken]
+auth_uri = http://controller01:5000 
+auth_url = http://controller01:35357 
+auth_plugin = password
+project_domain_id = default 
+user_domain_id = default 
+project_name = service 
+username = nova
+password = nova
+
+[glance]
+host = controller01
+
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+
+## END updates to /etc/nova/nova.conf
+
+openstack user create --password nova nova
+openstack role add --project service --user nova admin
+
+openstack service create --name nova --description "OpenStack Compute" compute
+
+openstack endpoint create --publicurl http://controller01:8774/v2/%\(tenant_id\)s --internalurl http://controller01:8774/v2/%\(tenant_id\)s --adminurl http://controller01:8774/v2/%\(tenant_id\)s --region RegionOne compute
+
+su -s /bin/sh -c "nova-manage db sync" nova
+
+service nova-api restart
+service nova-cert restart
+service nova-consoleauth restart 
+service nova-scheduler restart
+service nova-conductor restart
+service nova-novncproxy restart
+
+## !!!!!
+## STOP HERE. Proceed with compute installation on compute nodes before proceeding!
+## !!!!!
+
+== Verify Nova services ==
+
+nova service-list
+
+== Installing Dashboard ==
+
+apt-get install openstack-dashboard
+
+## BEGIN updates to /etc/openstack-dashboard/local_settings.py
+
+OPENSTACK_HOST = "controller01"
+OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
+
+## END updates to /etc/openstack-dashboard/local_settings.py
+
+service apache2 reload
+apt-get remove openstack-dashboard-ubuntu-theme
+

@@ -1,0 +1,66 @@
+= Initial Steps =
+
+apt-get update
+apt-get install ubuntu-cloud-keyring
+
+cat > /etc/apt/sources.list.d/cloudarchive-kilo.list <<EOF
+deb http://ubuntu-cloud.archive.canonical.com/ubuntu trusty-updates/kilo main
+EOF
+
+apt-get install crudini curl
+hostnamectl set-hostname compute02.learningneutron.com
+
+## BEGIN updates to /etc/hosts with the following:
+
+10.254.254.100 controller01.learningneutron.com controller01 
+10.254.254.101 compute01.learningneutron.com compute01 
+10.254.254.102 compute02.learningneutron.com compute02
+
+## END updates to /etc/hosts
+
+apt-get install ntp
+apt-get update
+apt-get dist-upgrade
+reboot
+
+== Installing Compute ==
+
+apt-get install nova-compute sysfsutils
+
+## BEGIN updates to /etc/nova/nova.conf
+
+[DEFAULT]
+auth_strategy = keystone
+
+[keystone_authtoken]
+auth_uri = http://controller01:5000 
+auth_url = http://controller01:35357 
+auth_plugin = password 
+project_domain_id = default
+user_domain_id = default 
+project_name = service 
+username = nova
+password = nova
+
+[DEFAULT] 
+rpc_backend = rabbit
+my_ip = 10.254.254.102
+vncserver_proxyclient_address = 10.254.254.102
+vnc_enabled = True
+vncserver_listen = 0.0.0.0
+novncproxy_base_url = http://controller01:6080/vnc_auto.html
+
+[oslo_messaging_rabbit] 
+rabbit_host = controller01 
+rabbit_userid = openstack 
+rabbit_password = rabbit
+
+[glance]
+host = controller01
+
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+
+## END updates to /etc/nova/nova.conf
+
+service nova-compute restart

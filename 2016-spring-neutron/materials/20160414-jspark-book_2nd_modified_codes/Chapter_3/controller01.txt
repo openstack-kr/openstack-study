@@ -1,0 +1,147 @@
+== Installing Neutron ==
+
+apt-get install neutron-server neutron-dhcp-agent \
+neutron-metadata-agent neutron-plugin-ml2 neutron-common \
+python-neutronclient
+
+mysql –u root –p
+
+## Once you're at the MySQL prompt, enter the following:
+CREATE DATABASE neutron;
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'neutron';
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'neutron';
+quit;
+
+## BEGIN updates to /etc/neutron/neutron.conf 
+
+[database]
+connection = mysql://neutron:neutron@controller01/neutron
+
+[DEFAULT]
+service_plugins = router
+bind_host = 10.254.254.100
+core_plugin = ml2
+auth_strategy = keystone
+rpc_backend = rabbit
+notify_nova_on_port_status_changes = True 
+notify_nova_on_port_data_changes = True 
+nova_url = http://controller01:8774/v2
+
+[keystone_authtoken]
+auth_uri = http://controller01:5000
+auth_url = http://controller01:35357 
+auth_plugin = password 
+project_domain_id = default 
+user_domain_id = default 
+project_name = service
+username = neutron
+password = neutron
+
+[oslo_messaging_rabbit] 
+rabbit_host = controller01 
+rabbit_userid = openstack 
+rabbit_password = rabbit
+
+[nova]
+auth_url = http://controller01:35357 
+auth_plugin = password 
+project_domain_id = default 
+user_domain_id = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = nova
+
+
+## END updates to /etc/neutron/neutron.conf 
+
+== Configure endpoints ==
+
+openstack user create neutron --password neutron
+openstack role add --project service --user neutron admin
+
+openstack service create --name neutron --description "OpenStack Networking" network
+
+openstack endpoint create --publicurl http://controller01:9696 --adminurl http://controller01:9696 --internalurl http://controller01:9696 --region RegionOne network
+
+## BEGIN updates to /etc/sysctl.conf
+
+net.ipv4.ip_forward = 1 
+net.ipv4.conf.default.rp_filter = 0 
+net.ipv4.conf.all.rp_filter = 0
+
+## END updates to /etc/sysctl.conf
+
+sysctl -p
+
+## BEGIN updates to /etc/nova/nova.conf
+
+[DEFAULT]
+network_api_class = nova.network.neutronv2.api.API
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+security_group_api = neutron
+
+[neutron]
+url = http://controller01:9696
+auth_strategy = keystone
+admin_tenant_name = service
+admin_username = neutron
+admin_password = neutron
+admin_auth_url = http://controller01:35357/v2.0
+
+## END updates to /etc/nova/nova.conf
+
+su -s /bin/sh -c "neutron-db-manage \
+--config-file /etc/neutron/neutron.conf \
+--config-file /etc/neutron/plugins/ml2/ml2_conf.ini \
+upgrade head" neutron
+
+service nova-api restart
+service nova-scheduler restart 
+service nova-conductor restart
+service neutron-server restart
+
+== Configure DHCP agent ==
+
+## BEGIN updates to /etc/neutron/dhcp_agent.ini
+
+[DEFAULT]
+interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
+enable_isolated_metadata = True
+dhcp_domain = learningneutron.com
+dhcp_delete_namespaces = true 
+
+## END updates to /etc/neutron/dhcp_agent.ini
+
+service neutron-dhcp-agent restart
+service neutron-dhcp-agent status
+neutron agent-list
+
+== Configure metadata agent ==
+
+## BEGIN updates to /etc/nova/nova.conf
+
+[neutron]
+metadata_proxy_shared_secret = metadatasecret123 
+service_metadata_proxy = true
+
+## END updates to /etc/nova/nova.conf
+
+## BEGIN updates to /etc/neutron/metadata_agent.ini
+
+[DEFAULT]
+auth_url = http://controller01:5000/v2.0 
+auth_region = regionOne
+admin_tenant_name = service
+admin_user = neutron
+admin_password = neutron
+nova_metadata_ip = controller01 
+metadata_proxy_shared_secret = metadatasecret123
+
+## END updates to /etc/neutron/metadata_agent.ini
+
+service nova-api restart
+service neutron-metadata-agent restart
+service neutron-metadata-agent status
+neutron agent-list
+
