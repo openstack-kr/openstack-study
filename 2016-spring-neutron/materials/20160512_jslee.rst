@@ -1,0 +1,332 @@
+네트워크 생성과 IP 할당과정
+===========================
+
+네트워크 생성
+-------------
+외부 네트워크 생성
+~~~~~~~~~~~~~~~~~~
+ext-net 생성
+::
+    $ . admin-openrc.sh
+    $ neutron net-create ext-net --router:external --provider:physical_network external --provider:network_type flat
+    Created a new network:
+    +---------------------------+--------------------------------------+
+    | Field                     | Value                                |
+    +---------------------------+--------------------------------------+
+    | admin_state_up            | True                                 |
+    | id                        | d3ebc151-7cd5-4f72-903a-b32b13540de1 |
+    | mtu                       | 0                                    |
+    | name                      | ext-net                              |
+    | provider:network_type     | flat                                 |
+    | provider:physical_network | external                             |
+    | provider:segmentation_id  |                                      |
+    | router:external           | True                                 |
+    | shared                    | False                                |
+    | status                    | ACTIVE                               |
+    | subnets                   |                                      |
+    | tenant_id                 | a159c559301a46cbbeb26b82e2342ef3     |
+    +---------------------------+--------------------------------------+
+
+외부 서브넷 생성
+~~~~~~~~~~~~~~~
+
+$ neutron subnet-create ext-net EXTERNAL_NETWORK_CIDR --name ext-subnet --allocation-pool start=FLOATING_IP_START,end=FLOATING_IP_END --disable-dhcp --gateway EXTERNAL_NETWORK_GATEWAY
+::
+    $ neutron subnet-create ext-net 192.168.57.0/24 --name ext-subnet --allocation-pool start=192.168.57.50,end=192.168.57.200 --disable-dhcp --gateway 192.168.57.1
+    Created a new subnet:
+    +-------------------+-----------------------------------------------------+
+    | Field             | Value                                               |
+    +-------------------+-----------------------------------------------------+
+    | allocation_pools  | {"start": "192.168.57.50", "end": "192.168.57.200"} |
+    | cidr              | 192.168.57.0/24                                     |
+    | dns_nameservers   |                                                     |
+    | enable_dhcp       | False                                               |
+    | gateway_ip        | 192.168.57.1                                        |
+    | host_routes       |                                                     |
+    | id                | 6ea6b970-d3a7-48c6-acb7-8f3756a7c8ca                |
+    | ip_version        | 4                                                   |
+    | ipv6_address_mode |                                                     |
+    | ipv6_ra_mode      |                                                     |
+    | name              | ext-subnet                                          |
+    | network_id        | d3ebc151-7cd5-4f72-903a-b32b13540de1                |
+    | subnetpool_id     |                                                     |
+    | tenant_id         | a159c559301a46cbbeb26b82e2342ef3                    |
+    +-------------------+-----------------------------------------------------+
+
+테넌트 네트워크 생성
+~~~~~~~~~~~~~~~~~~~
+demo유저 권한으로 demo-net 생성
+::
+    $ . demo-openrc.sh
+    $ neutron net-create demo-net
+    Created a new network:
+    +-----------------+--------------------------------------+
+    | Field           | Value                                |
+    +-----------------+--------------------------------------+
+    | admin_state_up  | True                                 |
+    | id              | 9a7c4a3f-1c99-425e-9433-83bac22863c3 |
+    | mtu             | 0                                    |
+    | name            | demo-net                             |
+    | router:external | False                                |
+    | shared          | False                                |
+    | status          | ACTIVE                               |
+    | subnets         |                                      |
+    | tenant_id       | 01731b00506a45bb8ecc22e133b0662b     |
+    +-----------------+--------------------------------------+
+
+테넌트 서브넷 생성
+~~~~~~~~~~~~~~~~~~
+
+$ neutron subnet-create demo-net TENANT_NETWORK_CIDR --name demo-subnet --dns-nameserver DNS_RESOLVER --gateway TENANT_NETWORK_GATEWAY
+::
+    $ neutron subnet-create demo-net 192.168.1.0/24   --name demo-subnet --dns-nameserver 8.8.4.4 --gateway 192.168.1.1
+    Created a new subnet:
+    +-------------------+--------------------------------------------------+
+    | Field             | Value                                            |
+    +-------------------+--------------------------------------------------+
+    | allocation_pools  | {"start": "192.168.1.2", "end": "192.168.1.254"} |
+    | cidr              | 192.168.1.0/24                                   |
+    | dns_nameservers   | 8.8.4.4                                          |
+    | enable_dhcp       | True                                             |
+    | gateway_ip        | 192.168.1.1                                      |
+    | host_routes       |                                                  |
+    | id                | 42570a5d-de05-4a61-b1ef-4db6b89fd477             |
+    | ip_version        | 4                                                |
+    | ipv6_address_mode |                                                  |
+    | ipv6_ra_mode      |                                                  |
+    | name              | demo-subnet                                      |
+    | network_id        | 9a7c4a3f-1c99-425e-9433-83bac22863c3             |
+    | subnetpool_id     |                                                  |
+    | tenant_id         | 01731b00506a45bb8ecc22e133b0662b                 |
+    +-------------------+--------------------------------------------------+
+
+라우터 생성
+~~~~~~~~~~
+외부 네트워크로 연결될 라우터 생성
+::
+    $ neutron router-create demo-router
+
+라우터와 subnet 연결
+~~~~~~~~~~~~~~~~~~~
+라우터와 서브넷을 연결한다
+::
+    $ neutron router-interface-add demo-router demo-subnet
+
+라우터와 extnet 연결
+~~~~~~~~~~~~~~~~~~~~
+라우터와 외부 네트워크를 연결한다
+::
+    $ neutron router-gateway-set demo-router ext-net
+
+
+네트워크와 라우터를 만들 때 네임스페이스 생성됨
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ip netns를 통해 네임스페이스 확인
+::
+    [root@controller ~]# ip netns
+    qrouter-473c04c8-dceb-4acf-9dc6-939e10e51c39
+    qdhcp-9a7c4a3f-1c99-425e-9433-83bac22863c3
+
+네트워크 생성 시 dhcp네임스페이스 안에 tab인터페이스 생성
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ip netns exec <NAMESPACE> <Command> 를 통해 네임스페이스 안에서 명령어를 실행한다
+다음은 dhcp네임스페이스에서 네트워크 인터페이스를 확인한다
+::
+    [root@controller ~]# ip netns exec qdhcp-9a7c4a3f-1c99-425e-9433-83bac22863c3 ip a
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+           valid_lft forever preferred_lft forever
+        inet6 ::1/128 scope host 
+           valid_lft forever preferred_lft forever
+    13: tapf668c6cf-ab: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN 
+        link/ether fa:16:3e:75:7b:80 brd ff:ff:ff:ff:ff:ff
+        inet 192.168.1.2/24 brd 192.168.1.255 scope global tapf668c6cf-ab
+           valid_lft forever preferred_lft forever
+        inet6 fe80::f816:3eff:fe75:7b80/64 scope link 
+           valid_lft forever preferred_lft forever
+
+라우터 생성 시 라우터 네임스페이스안에 qg, qr인터페이스 생성
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+라우터 네임스페이스에서 인터페이스를 확인한다
+::
+    [root@controller ~] ip netns exec qrouter-473c04c8-dceb-4acf-9dc6-939e10e51c39 ip a
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+           valid_lft forever preferred_lft forever
+        inet6 ::1/128 scope host 
+           valid_lft forever preferred_lft forever
+    14: qr-03d6d0da-36: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN 
+        link/ether fa:16:3e:da:51:23 brd ff:ff:ff:ff:ff:ff
+        inet 192.168.1.1/24 brd 192.168.1.255 scope global qr-03d6d0da-36
+           valid_lft forever preferred_lft forever
+        inet6 fe80::f816:3eff:feda:5123/64 scope link 
+           valid_lft forever preferred_lft forever
+    15: qg-10941148-e0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN 
+        link/ether fa:16:3e:d8:82:6c brd ff:ff:ff:ff:ff:ff
+        inet 192.168.57.50/24 brd 192.168.57.255 scope global qg-10941148-e0
+           valid_lft forever preferred_lft forever
+        inet6 fe80::f816:3eff:fed8:826c/64 scope link 
+           valid_lft forever preferred_lft forever
+
+OVS에서도 포트와 연결된 인터페이스 확인 가능
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ovs-vsctl명령어를 사용해 open vswitch에서 라우터와 연결된 인터페이스를 확인할 수 있다
+::
+    [root@controller ~] ovs-vsctl show
+    d6f2c3a2-805e-42cd-ac1b-ad80c6c124cc
+        Bridge br-int
+            fail_mode: secure
+            Port "tapf668c6cf-ab"
+                tag: 3   
+                Interface "tapf668c6cf-ab"
+                    type: internal
+            Port patch-tun
+                Interface patch-tun
+                    type: patch
+                    options: {peer=patch-int}
+            Port br-int  
+                Interface br-int
+                    type: internal
+            Port int-br-ex
+                Interface int-br-ex
+                    type: patch
+                    options: {peer=phy-br-ex}
+            Port "qg-10941148-e0"
+                tag: 4   
+                Interface "qg-10941148-e0"
+                    type: internal
+            Port "qr-03d6d0da-36"
+                tag: 3   
+                Interface "qr-03d6d0da-36"
+                    type: internal 
+
+인스턴스 생성
+-------------
+
+인스턴스를 생성하면 VM이 부팅하면서 dhcp 요청을 통해 IP를 할당받는다. 
+::
+    $ nova boot —flavor <FLAVOR> —image <IMAGE NAME> —nic net-id=<NETWORK ID> <INSTANCE NAME> $ nova boot --flavor m1.tiny --image cirros-0.3.4-x86_64 --nic net-id=6d04102d-c2e3-4497-b74b-9d77f282dc75 demo-instance1
+
+dhcp 로그
+---------
+network node의 dhcp namespace에서 tcpdump 수행
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+VM이 부팅할 때 네트워크 노드의 dhcp 네임스페이스에서 tcpdump를 하면, dhcp 요청/할당 패킷을 볼 수 있다.(Discover - Offer - Request - Ack 과정)
+::
+    [root@controller ~] ip netns exec qdhcp-9a7c4a3f-1c99-425e-9433-83bac22863c3 tcpdump -i any -vvv -ne port 67 or port 68
+     
+    17:21:17.351126   B fa:16:3e:6a:32:18 ethertype IPv4 (0x0800), length 334: (tos 0x0, ttl 64, id 0, offset 0, flags [none], proto UDP (17), length 318)
+        0.0.0.0.bootpc > 255.255.255.255.bootps: [udp sum ok] BOOTP/DHCP, Request from fa:16:3e:6a:32:18, length 290, xid 0x28538504, Flags [none] (0x0000)
+              Client-Ethernet-Address fa:16:3e:6a:32:18
+              Vendor-rfc1048 Extensions
+                Magic Cookie 0x63825363
+                DHCP-Message Option 53, length 1: Discover
+                Client-ID Option 61, length 7: ether fa:16:3e:6a:32:18
+                MSZ Option 57, length 2: 576
+                Parameter-Request Option 55, length 9:
+                  Subnet-Mask, Default-Gateway, Domain-Name-Server, Hostname
+                  Domain-Name, MTU, BR, NTP
+                  Classless-Static-Route
+                Vendor-Class Option 60, length 12: "udhcp 1.20.1"
+                Hostname Option 12, length 6: "cirros"
+                END Option 255, length 0
+    17:21:17.351605 Out fa:16:3e:75:7b:80 ethertype IPv4 (0x0800), length 356: (tos 0xc0, ttl 64, id 4636, offset 0, flags [none], proto UDP (17), length 340)
+        192.168.1.2.bootps > 192.168.1.10.bootpc: [udp sum ok] BOOTP/DHCP, Reply, length 312, xid 0x28538504, Flags [none] (0x0000)
+              Your-IP 192.168.1.10
+              Server-IP 192.168.1.2
+              Client-Ethernet-Address fa:16:3e:6a:32:18
+              Vendor-rfc1048 Extensions
+                Magic Cookie 0x63825363
+                DHCP-Message Option 53, length 1: Offer
+                Server-ID Option 54, length 4: 192.168.1.2
+                Lease-Time Option 51, length 4: 86400
+                RN Option 58, length 4: 43200
+                RB Option 59, length 4: 75600
+                Subnet-Mask Option 1, length 4: 255.255.255.0
+                BR Option 28, length 4: 192.168.1.255
+                Domain-Name Option 15, length 14: "openstacklocal"
+                Default-Gateway Option 3, length 4: 192.168.1.1
+                Domain-Name-Server Option 6, length 4: 8.8.4.4
+                MTU Option 26, length 2: 1454
+                END Option 255, length 0
+    17:21:17.363957   B fa:16:3e:6a:32:18 ethertype IPv4 (0x0800), length 346: (tos 0x0, ttl 64, id 0, offset 0, flags [none], proto UDP (17), length 330)
+        0.0.0.0.bootpc > 255.255.255.255.bootps: [udp sum ok] BOOTP/DHCP, Request from fa:16:3e:6a:32:18, length 302, xid 0x28538504, Flags [none] (0x0000)
+              Client-Ethernet-Address fa:16:3e:6a:32:18
+              Vendor-rfc1048 Extensions
+                Magic Cookie 0x63825363
+                DHCP-Message Option 53, length 1: Request
+                Client-ID Option 61, length 7: ether fa:16:3e:6a:32:18
+                Requested-IP Option 50, length 4: 192.168.1.10
+                Server-ID Option 54, length 4: 192.168.1.2
+                MSZ Option 57, length 2: 576
+                Parameter-Request Option 55, length 9:
+                  Subnet-Mask, Default-Gateway, Domain-Name-Server, Hostname
+                  Domain-Name, MTU, BR, NTP
+                  Classless-Static-Route
+                Vendor-Class Option 60, length 12: "udhcp 1.20.1"
+                Hostname Option 12, length 6: "cirros"
+                END Option 255, length 0
+    17:21:17.368190 Out fa:16:3e:75:7b:80 ethertype IPv4 (0x0800), length 375: (tos 0xc0, ttl 64, id 4637, offset 0, flags [none], proto UDP (17), length 359)
+        192.168.1.2.bootps > 192.168.1.10.bootpc: [udp sum ok] BOOTP/DHCP, Reply, length 331, xid 0x28538504, Flags [none] (0x0000)
+              Your-IP 192.168.1.10
+              Server-IP 192.168.1.2
+              Client-Ethernet-Address fa:16:3e:6a:32:18
+              Vendor-rfc1048 Extensions
+                Magic Cookie 0x63825363
+                DHCP-Message Option 53, length 1: ACK
+                Server-ID Option 54, length 4: 192.168.1.2
+                Lease-Time Option 51, length 4: 86400
+                RN Option 58, length 4: 43200
+                RB Option 59, length 4: 75600
+                Subnet-Mask Option 1, length 4: 255.255.255.0
+                BR Option 28, length 4: 192.168.1.255
+                Domain-Name Option 15, length 14: "openstacklocal"
+                Hostname Option 12, length 17: "host-192-168-1-10"
+                Default-Gateway Option 3, length 4: 192.168.1.1
+                Domain-Name-Server Option 6, length 4: 8.8.4.4
+                MTU Option 26, length 2: 1454
+                END Option 255, length 0
+
+vm에서 metadata  받아오기
+--------------------------
+Icloud-init이 169.254.169.254/latest/meta-data로 인스턴스 정보를 받아옴
+IP를 할당받은 VM은 바로 메타데이터 서버로 vm 메타데이터를 요청한다. 메타데이터 주소는 169.254.169.254를 사용하며, 
+vm네트워크의 route를 따라 네트워크 노드의 qrouter 네임스페이스까지 온 후 iptables의 nat된 규칙에 따라 controller의 neutron-ns-metadata-proxy가 요청을 처리한다. 
+아래는 router네임스페이스에서 iptables 규칙으로 169.254.169.254요청이 들어오면 9697 포트로 redirect하며, 9697포트는 14870 python프로세스, 즉 neutron-ns-metadata-proxy서비스가 Listen중입을 확인한 것이다.
+::
+    [root@controller ~]# ip netns exec qrouter-473c04c8-dceb-4acf-9dc6-939e10e51c39 iptables -t nat -S
+    -P PREROUTING ACCEPT
+    -P INPUT ACCEPT
+    -P OUTPUT ACCEPT
+    -P POSTROUTING ACCEPT
+    -N neutron-l3-agent-OUTPUT
+    -N neutron-l3-agent-POSTROUTING
+    -N neutron-l3-agent-PREROUTING
+    -N neutron-l3-agent-float-snat
+    -N neutron-l3-agent-snat
+    -N neutron-postrouting-bottom
+    -A PREROUTING -j neutron-l3-agent-PREROUTING
+    -A OUTPUT -j neutron-l3-agent-OUTPUT
+    -A POSTROUTING -j neutron-l3-agent-POSTROUTING
+    -A POSTROUTING -j neutron-postrouting-bottom
+    -A neutron-l3-agent-POSTROUTING ! -i qg-10941148-e0 ! -o qg-10941148-e0 -m conntrack ! --ctstate DNAT -j ACCEPT
+    -A neutron-l3-agent-PREROUTING -d 169.254.169.254/32 -i qr-+ -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 9697
+    -A neutron-l3-agent-snat -j neutron-l3-agent-float-snat
+    -A neutron-l3-agent-snat -o qg-10941148-e0 -j SNAT --to-source 192.168.57.50
+    -A neutron-l3-agent-snat -m mark ! --mark 0x2 -m conntrack --ctstate DNAT -j SNAT --to-source 192.168.57.50
+    -A neutron-postrouting-bottom -m comment --comment "Perform source NAT on outgoing traffic." -j neutron-l3-agent-snat
+     
+    [root@controller ~]# ip netns exec qrouter-473c04c8-dceb-4acf-9dc6-939e10e51c39 netstat -nap
+    Active Internet connections (servers and established)
+    Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+    tcp        0      0 0.0.0.0:9697            0.0.0.0:*               LISTEN      14870/python2       
+    Active UNIX domain sockets (servers and established)
+    Proto RefCnt Flags       Type       State         I-Node   PID/Program name     Path
+    [root@controller ~]# ip netns exec qrouter-473c04c8-dceb-4acf-9dc6-939e10e51c39 ps aux|grep 14870
+    neutron  14870  0.0  0.4 307960 36924 ?        S    15:53   0:00 /usr/bin/python2 /bin/neutron-ns-metadata-proxy --pid_file=/var/lib/neutron/external/pids/473c04c8-dceb-4acf-9dc6-939e10e51c39.pid --metadata_proxy_socket=/var/lib/neutron/metadata_proxy --router_id=473c04c8-dceb-4acf-9dc6-939e10e51c39 --state_path=/var/lib/neutron --metadata_port=9697 --metadata_proxy_user=991 --metadata_proxy_group=988 --debug --verbose --log-file=neutron-ns-metadata-proxy-473c04c8-dceb-4acf-9dc6-939e10e51c39.log --log-dir=/var/log/neutron
+    root     30757  0.0  0.0 116808  1012 pts/3    R+   18:06   0:00 grep --color=auto 14870
+
+이렇게 메타데이터 서버와 연결이 되면, VM은 hostname 설정과 user-data 실행 등 추가 작업에 필요한 데이터를 받아올 수 있다.
