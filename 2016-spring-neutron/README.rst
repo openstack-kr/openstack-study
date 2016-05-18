@@ -74,7 +74,8 @@ Day 2: Apr 14, 2016
 
  * 자료
 
-   * 권영부: (업데이트 예정) 
+   * 권영부: `발표 자료 <materials/20160414_kwonyoungbu.pdf>`_
+     (`docx 원본 <materials/20160414_kwonyoungbu.docx>`_)
    * 박준상
 
      * `발표 자료 <materials/20160414-jspark-chapter1_and_2.pdf>`_
@@ -97,7 +98,8 @@ Day 3: Apr 21, 2016
 
    * 성호찬: `발표 자료 <materials/20160509_sunh.pdf>`_
      (`docx 원본 <materials/20160509_sunh.docx>`_)
-   * 최광훈: (업데이트 예정)
+   * 최광훈: `발표 자료 <materials/20160509_ml2.pdf>`_
+     (`pptx 원본 <materials/20160509_ml2.pptx>`_)
 
  * 참고 자료
 
@@ -131,9 +133,9 @@ Day 5: May 12, 2016
 
  * 자료
 
-   * 이재상: (업데이트 예정)
+   * 이재상: `발표 자료 <materials/20160512_jslee.rst>`_
    * 박진산: (업데이트 예정)
-   * 이석원: (업데이트 예정)
+   * 이석원: `발표 자료 <materials/20160512_yisukwon.pdf>`_
 
  * 참고 자료
 
