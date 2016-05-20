@@ -150,6 +150,10 @@ Day 6: May 19, 2016
  * 내용
 
    * Chapter 7. Load Balancing Traffic in Neutron
+    
+ * 자료
+ 
+   * 김진우: `발표 자료 <https://wikibootup.gitbooks.io/network/content/ptolb.html>`_
 
 Day 7: May 26, 2016
 ===================
