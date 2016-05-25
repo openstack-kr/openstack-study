@@ -70,6 +70,11 @@ Day 3: May 10, 2016
 Day 4: May 24, 2016
 ===================
 
+ * `OpenStack Networking and Installation with Linux Bridge (김영우) <20160524/01_김영우.pdf>`_
+ * `DevStack 명령어 (장수지) <20160524/02_DevStack명령어_장수지.pdf>`_
+   (`pptx 원본 <20160524/02_DevStack명령어_장수지.pptx>`_)
+ * `오픈스택 설치 후기 (황학범) <20160524/03_오픈스택세미나_설치후기_황학범.pdf>`_
+
 Contributing
 ============
 
