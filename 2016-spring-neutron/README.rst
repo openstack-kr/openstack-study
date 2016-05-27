@@ -162,6 +162,10 @@ Day 7: May 26, 2016
 
    * Chapter 8. Protecting Instances on the Network
 
+ * 자료
+
+   * 이국화: `발표 자료 <materials/20160526_heavenkong.pdf>`_
+
 Day 8: Jun 2, 2016
 ==================
 
