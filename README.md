@@ -5,6 +5,8 @@ The repository for study activities in OpenStack Korea User Group (오픈스택 
 
 * [2016년 상반기 A반: 오픈스택을 다루기 위해 알아야 할 기본기 스터디]
   (2016-spring-a)
+* [2016년 상반기 A반 with Red Hat Korea: 오픈스택을 다루기 위해 알아야 할 기본기 스터디]
+  (2016-spring-a-redhat)
 * [2016년 상반기 B반: Neutron 스터디]
   (2016-spring-neutron)
 
