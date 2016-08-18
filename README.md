@@ -10,4 +10,4 @@ The repository for study activities in OpenStack Korea User Group (오픈스택 
 * [2016년 상반기 B반: Neutron 스터디]
   (2016-spring-neutron)
 * [2016년 여름: Ansible로 살펴보는 Configuration Management]
-  (2016-summer-ansible)
+  (http://github.com/fuhaha/ansible_study)
