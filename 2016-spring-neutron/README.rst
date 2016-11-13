@@ -171,21 +171,27 @@ Day 8: Jun 2, 2016
 
  * 내용
 
-   * (추후 업데이트 예정)
+   * (각자 컴퓨터 또는 접근 가능한 서버에 설치 환경을 원하는대로 구성 후 잘 안되는 사항이 있으면 서로 논의하면서
+     스터디를 진행하는 것으로 대체)
+   * 최영락: OpenStack Training Labs 소개 (http://docs.openstack.org/training_labs/)
 
-Day 9: Jun 9, 2016
+Day 9: Jun 16, 2016
 ==================
 
  * 내용
 
-   * (추후 업데이트 예정)
+   * (각자 설치하는 환경을 기반으로 Trouble shooting)
+   * 확인 사항 (예시):
+     * 1. 리눅스브릿지와 ovs간 설정 이슈 해결
+     * 2. 교재 4장에서는 flat network이 아니라 usernetwork을 사용함
 
-Day 10: Jun 16, 2016
+Day 10: Jun 23, 2016
 ====================
 
  * 내용
 
-   * (추후 업데이트 예정)
+   * Training-labs 쪽 linux bridge + vxlan
+   * Cygwin을 활용한 설치 이슈
 
 Contributing
 ============
