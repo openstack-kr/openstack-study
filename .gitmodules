@@ -1,4 +1,4 @@
 [submodule "ansible_study"]
-	path = ansible_study
+	path = 2016-summer-ansible
 	url = https://github.com/fuhaha/ansible_study.git
 	branch = master
