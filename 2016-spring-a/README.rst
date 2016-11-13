@@ -7,6 +7,10 @@ basic skills on OpenStack project in Korea user group as study activities.
 For more details, see the `Etherpad for study A team in 2016 Spring
 <https://etherpad.openstack.org/p/openstack-korea-ug-study-2016-class-A>`_.
 
+* 본 스터디는 NAVER D2 개발자 지원 프로그램과 함께 하였습니다.
+ * 커뮤니티 지원: http://developer.naver.com/wiki/pages/communityStatus
+ * NAVER D2 공식 홈페이지: http://d2.naver.com/
+
 
 Recommended References
 ======================
