@@ -1,4 +1,74 @@
 # 2016년 upstream : 오픈스택 컨트리뷰션 스터디
+
+*****************************************************************
+
+* 이 저장소는 OpenStack 업스트림 컨트리뷰션과 관련된
+  스터디한 자료를 모아둔 곳입니다.
+* This repository data is for studying OpenStack contribution
+  using upstream training materials.
+
+*****************************************************************
+
+* 본 스터디는 NAVER D2 개발자 지원 프로그램과 함께 하였습니다.
+ * 커뮤니티 지원: http://developer.naver.com/wiki/pages/communityStatus
+ * NAVER D2 공식 홈페이지: http://d2.naver.com/
+
+## 스터디 개요 (Overview)
+
+이번 스터디는 Openstack 컨트리뷰션을 주제로 하여, 한글 번역된
+[업스트림 트레이닝](http://docs.openstack.org/ko_KR/upstream-training/)
+자료와 함께 진행하고자 합니다.
+같이 즐겁고 재미있게 스터디를 한 후 해당 스터디 경험을 토대로,
+2017년 2월 11일 (토) 진행 예정인 제2회 업스트림 트레이닝 행사를
+같이 기획 및 진행을 하는 자리를 갖고자 합니다.
+
+* 참가 대상
+
+  * OpenStack 컨트리뷰션 프로세스를 알고자 하는 분
+
+  * 실제 OpenStack 컨트리뷰션에 관심 있으신 분
+
+  * git, git-review, Launchpad, Gerrit 등 컨트리뷰션 관련 도구를 알고자 하시는 분
+
+  * 끈기있게 스터디에 참석하실 분
+    & 커뮤니티 구성원들과 함께 즐겁게 스터디 후 2017년 2월 11일 행사 진행을 같이
+    도와주실 분
+
+* 참가비
+
+  * 무료
+
+* 진행 (예상) 일정
+
+  * 11/22 (화) 20:00-22:00
+
+    * https://etherpad.openstack.org/p/upstream-training-korea-2016-fall-study
+    * <실습> git 도구 익숙해지기
+
+  * 12/13 (화) 20:00-22:00
+
+    * <실습> IRC 프로그램 & 미팅
+
+  * 12/20 (화) 20:00-22:00
+
+    * <실습> OpenStack 관련 계정 등록 및 git-review 설치
+
+  * 1/10 (화) 20:00-22:00
+
+    * <실습> Sandbox 저장소 커밋
+
+  * 1/24 (화) 20:00-22:00
+
+    * <실습> Launchpad와 연동
+
+  * 2/7 (화) 20:00-22:00
+
+    * <실습> 문서화 & 번역 프로젝트
+
+  * 2/11 (토) 10:00-18:00
+
+    * <제2회 업스트림 트레이닝 개최 예정>
+
 ## [사전 준비]
 * http://docs.openstack.org/ko_KR/upstream-training/ 미리 읽어보기
 
@@ -81,3 +151,4 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
 5. 혹시 자신에게 아무런 점수/comment가 주말까지도 없는 경우 임의로 스터디원 중 1명을 reviewer 초대
 6. 자신의 패치가 마음에 들지 않으면 abandon을 하고 새로 올린다.
 7. Exercise : 자신의 patchset 2 or 3 올리기.
+
