@@ -83,10 +83,10 @@
 * http://docs.openstack.org/ko_KR/
 * etherpad 공유문서 : https://etherpad.openstack.org/p/upstream-training-korea-2016-fall-study
 ### Git
-* Git log
-* Git status
-* Git remote -v -> remote URL을 추가하여 clone 받는 곳과 push 하는 repository를 다르게 설정 할 수도 있다.
-* Git commit 관련 규칙 : https://medium.com/@preslavrachev/what-s-with-the-50-72-rule-8a906f61f09c#.h309t4bqy
+* `git log`
+* `git status`
+* `git remote -v` -> remote URL을 추가하여 clone 받는 곳과 push 하는 repository를 다르게 설정 할 수도 있다.
+*  git commit 관련 규칙 : https://medium.com/@preslavrachev/what-s-with-the-50-72-rule-8a906f61f09c#.h309t4bqy
 ### 과제
 1. 리눅스 노드1(가상머신 or 물리머신 or mac) 
 2. www.openstack.org -> Foundation member로 가입(Community Memeber는 안됨)
@@ -117,28 +117,26 @@
     * 미팅이 시작되면 http://eavesdrop.openstack.org/meetings/ 에 디렉터리가 생성되며, 삭제되지 않으므로 미팅을 시작하기 전에 함부로 생성되지 않도록 주의하여야 한다.
 
 ### Git review와 Gerrit 이용하기
-* git-review 설치(sudo apt install git-review)
+* git-review 설치(`sudo apt install git-review`)
 * Upstream training github 주소 : http://docs.openstack.org/ko_KR/upstream-training/git.html
-* git clone http://docs.openstack.org/ko_KR/upstream-training/git.html
-* git config --global gitreview.username <username> (빼먹을 수 있으니 주의)
-* git review -s (git review를 local repository에 설치한다.)
+* `git clone http://docs.openstack.org/ko_KR/upstream-training/git.html`
+* `git config --global gitreview.username <username>` (빼먹을 수 있으니 주의)
+* `git review -s` (git review를 local repository에 설치한다.)
 
-<pre><code>
 Trying again with ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
 Creating a git remote called "gerrit" that maps to:
 ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
-</code></pre>
 와 같이 콘솔창에 출력되면 성공적으로 git review가 세팅되었다.
 
 * Dummy file 추가하기
-<code>cat > ko24.txt</code>
-<code>git add ko24.txt</code>
-<code>git commit -m "Test commit"</code>
-<code>git review</code>
+```$ cat > ko24.txt```
+```$ git add ko24.txt```
+```$ git commit -m "Test commit"```
+```$ git review```
   * git review를 하고 나면 https://review.openstack.org/#/c/410196/ 와 같은 gerrit URL이 생성된다.
 
     * Permission Key Denied가 뜬 경우
-     1. username을 입력하지 않았다.(git config --global gitreview.username <username>)
+     1. username을 입력하지 않았다.(`git config --global gitreview.username <username>`)
      2. Openstack Foundation Member가 아니다. (Community Member는 안됨.)
      3. Gerrit에서 ICLA Agree를 하지 않았다.
      4. Gerrit에서 Contact Information을 넣지 않았다.(review.openstack.org -> Contact information last updated on 이 있어야 함.)
@@ -158,3 +156,44 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
 6. 자신의 패치가 마음에 들지 않으면 abandon을 하고 새로 올린다.
 7. Exercise : 자신의 patchset 2 or 3 올리기.
 
+## [2016/12/20] 3회차 스터디
+### git status 변경사항이 생겼을때 -> 변경사항을 없애는 방법!(Untracked files, 즉 필요없는 파일이 생겼다)
+* `git clean -xfd` : 저장소를 clean (현재 관리되고 있는 파일을 제외한 / 관리되지 않는 파일들)
+  * `man git -clean` (Changes to be committed : 문구를 잘 확인해 보세요!)
+
+* `git checkout -- [filename]` : commit 전에 원래 수정 전으로 돌리고 싶을 때(Changes not staged for commit -> Changes to be committed)
+  * `git diff` 로 차이점 확인
+
+* `git stash` : 내가 수정한 내역을 commit 하기 전에 stack에 저장할 수 있다.
+   ```$ git stash list```
+  * 원래대로 복원 -> `git stash pop`
+  * stack 지우기 -> `git stash drop`
+   ```$ git stash```
+   ```$ git stash drop```
+  cf. ```$ man git-clean```
+
+### gerrit filter
+* e.g.) Project 필터 => project:openstack-dev/sandbox
+* comment : draft -> post를 선택해야 글이 올라갑니다.
+* patch가 올라갈수록 왼쪽 오른쪽에서 commit이 되면서 생긴 아지머을 볼 수 있다.
+  * patchset 1, 2...에 reply를 달고 싶을 경우 -> Patch Sets에서 강제로 원하는 patch를 선택하고 comment
+
+### commit message
+* http://docs.openstack.org/ko_KR/upstream-training/workflow-commit-message.html#1
+* 처음에 보이는 commit message를 잘 적어야 merge 될 확률이 높다.
+  * 좋은 예 vs 나쁜 예 -> https://wiki.openstack.org/wiki/GitCommitMessages
+  * Including external references
+  cf. https://storyboard.openstack.org/#!/page/about
+* Change-Id vs commit Change-Id는 gerrit / github에서 변경사항을 볼 수 있다. commit은 commit에 대한 고유번호이다.
+* 다양한 Bug의 종류들 : Partial, Related, Closes...
+  * Needed-By, Depends-On 관계
+* Launchpad에는 bludprints라는 향후 계획에 대한 내용이 담겨있다.
+
+### <Self-exercise>
+* [Launchpad](https://bugs.launchpad.net/openstack-dev-sandbox) 에 버그를 등록한다.
+* 해당 버그 Assignee를 자신으로 할당한다.
+* openstack-dev/sandbox 저장소에 커밋을 하나 등록한다
+ : “Closes-Bug: #<버그 번호>”를 커밋 내용에 명시할 것
+* git review 명령어를 통해 해당 커밋을 등록한 후, Launchpad와 상호 레퍼런스가 되는지 확인한다.
+* (상호 레퍼런스가 되지 않았으면 커밋 메시지 수정 또는 Launchpad 상태를 재변경한다.)
+* 해당 Launchpad URL을 Slack에 공유
