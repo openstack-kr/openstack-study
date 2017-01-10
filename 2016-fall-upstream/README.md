@@ -190,7 +190,7 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
   * Needed-By, Depends-On 관계
 * Launchpad에는 bludprints라는 향후 계획에 대한 내용이 담겨있다.
 
-### <Self-exercise>
+### 과제
 * [Launchpad](https://bugs.launchpad.net/openstack-dev-sandbox) 에 버그를 등록한다.
 * 해당 버그 Assignee를 자신으로 할당한다.
 * openstack-dev/sandbox 저장소에 커밋을 하나 등록한다
@@ -198,3 +198,39 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
 * git review 명령어를 통해 해당 커밋을 등록한 후, Launchpad와 상호 레퍼런스가 되는지 확인한다.
 * (상호 레퍼런스가 되지 않았으면 커밋 메시지 수정 또는 Launchpad 상태를 재변경한다.)
 * 해당 Launchpad URL을 Slack에 공유
+
+## [2016/01/10] 4회차 스터디
+### Launchpad Status 버그 상태 관련 정리
+* New: "새롭게" 등록된 버그 (방금 새롭게 등록되어 아직 살펴보지 않았다는 의미를 내포)
+* Incomplete: 버그 보고가 "불완전": 상세한 정보를 포함하는 보고가 필요함
+* Opinion: 버그에 대한 "의견" 또는 토론이 필요함 (프로젝트와 성격이 안 맞는 등의 이슈)
+* Invalid: 요청한 내용이 버그가 아니라 Q&A, 기술 지원, 스팸 등에 해당되기에 "무효"함
+* Won't Fix: 현재 프로젝트 계획에서 볼 때 우선 순위가 낮거나 고려를 지금 할 수가 없음. 따라서 "고치지 않고자 함"
+* Confirmed: 보고자가 아닌 다른 사람이 해당 버그를 "확인"함
+* Triaged: 버그를 관리하는 감독자가 버그 중요성 등을 "구분"함
+* In Progress: 해당 버그에 대한 할당자가 생겼으며, 해당 할당자가 버그 "진행 중" (Gerrit에 업로드 되어 Merge되지 않은 상태 또한 진행 중으로 간주)
+* Fix Committed: 버그가 코드 저장소에 "커밋 내역으로 수정됨". Gerrit에서 Merged에 해당하나 해당 코드 저장소 tag이 이루어지지 않아, 릴리즈에는 반영이 안됨 (번역에서는 Zanata에 반영된 상태를 Fix Committed로 간주하고자 함)
+* Fix Released: 해당 수정 사항이 "릴리즈"에 최종 반영됨 (번역의 경우는 코드 저장소에 반영된 시점을 기준으로 하고자 함)
+  * e.g.) https://review.openstack.org/#/c/417663/1/doc/common/source/locale/ko_KR/LC_MESSAGES/common.po -> Bot이 일정 시간 간격으로 반영 -> Fix Committed
+  * cf. Development Schedule : https://releases.openstack.org/newton/index.html
+  * cf. review.openstack.org 에서 Related-Bug: #number 는 관련 버그를 검색하므로 자신으로 Assign이 되지 않는다.
+  * cf. gerrit과 git local commit에서의 user.name 계정이 같아야 동일한 소유자의 commit으로 인식하고 invalid가 되지 않는다.
+  * cf. 실제 버그를 해결해보기 : https://bugs.launchpad.net/openstack-manuals/+bug/1647779
+
+### 번역 가이드라인
+* 번역 단어집 : https://wiki.openstack.org/wiki/%EB%8B%A8%EC%96%B4%EC%A7%91
+* 번역을 수정 할 수 있는 사람 : reviewer / coordinator
+* Zanata에는 남은 비율에 비례하여 시간을 보여준다.
+  * e.g.) [단어집 관련 commit](https://review.openstack.org/#/c/418351/)
+  * cf. [Horizon 한국어 번역](https://translate.openstack.org/webtrans/translate?project=horizon&iteration=master&localeId=ko-KR&locale=en%20#view:doc;doc:releasenotes/source/locale/releasenotes)
+    * 메뉴에서 Incomplete 체크 -> Fuzzy와 Rejected 체크 해제(체크 하지 않고 Save를 하면 나머지 번역이 제대로 안된 부분도 반영된다.)
+    * 화살표에서 파란색 bar는 일반 참여자가 수정할 수 없음.
+  * 주의사항
+    * ``WORDS`` 뒤에 반드시 한글로 번역 할 때에는 띄어쓰기가 있어야 함. (``WORDS`` 를~)
+    * e.g.) deploymennts (`bug 1508571 <https://bugs.launchpad.net/horizon/+bug/1508571>`__). -> 한글로 번역시 괄호 앞 뒤로 띄워줘야 rst 문법 parser에서 인식이 가능함.
+    * %s의 경우 반드시 번역시에도 넣어줘야 함.(넣어주지 않으면 build시 에러 남.)
+* po file + pot file = 번역을 위한 파일
+* rst = Markdown 종류의 파일
+
+### 과제
+* Zanata에서 Horizon 번역을 300단어 이상 하기.
