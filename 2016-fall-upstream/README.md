@@ -19,6 +19,8 @@
 * [1회차 스터디 내용](#20161122-1회차-스터디)
 * [2회차 스터디 내용](#20161213-2회차-스터디)
 * [3회차 스터디 내용](#20161220-3회차-스터디)
+* [4회차 스터디 내용](#20170110-4회차-스터디)
+* [5회차 스터디 내용](#20170124-5회차-스터디)
 
 ## 스터디 개요 (Overview)
 
@@ -199,7 +201,7 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
 * (상호 레퍼런스가 되지 않았으면 커밋 메시지 수정 또는 Launchpad 상태를 재변경한다.)
 * 해당 Launchpad URL을 Slack에 공유
 
-## [2016/01/10] 4회차 스터디
+## [2017/01/10] 4회차 스터디
 ### Launchpad Status 버그 상태 관련 정리
 * New: "새롭게" 등록된 버그 (방금 새롭게 등록되어 아직 살펴보지 않았다는 의미를 내포)
 * Incomplete: 버그 보고가 "불완전": 상세한 정보를 포함하는 보고가 필요함
@@ -234,3 +236,69 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
 
 ### 과제
 * Zanata에서 Horizon 번역을 300단어 이상 하기.
+
+## [2017/01/24] 5회차 스터디
+### 컨트리뷰션이 가능한 영역
+1. Documentation
+2. I18n (not Zanata - translation)
+3. Actual project(s)
+
+### Documentation
+* 컨트리뷰션을 할 때 필요한 것들
+  1. 텍스트 수정 가능(혹은 추가)
+  2. rst 문법에 친숙하여야 함
+  3. convention을 알아야 함(예: 1줄에 80줄 이상을 넘기면 안됨.)
+  4. git review 하기 전에 로컬에서 빌드 후 확인
+  5. git review 등으로 패치
+  6. social conversation with Docs team people
+      * [Contributor Guide 참고](http://docs.openstack.org/)(Contributor Guide 영역)
+
+* 번역 관련 repositories
+  * openstack-manuals repository [통합 저장]
+  * api-site
+  * security-guides
+  * training-guides
+
+* directory 내 문서 위치 및 문서화 과정
+  * doc/[documentation_name]/source 폴더에 rst로 문서화 (e.g: https://github.com/openstack/openstack-manuals/tree/stable/newton/doc)
+  * Sphinx 프로그램에 의해 문서가 generation 된다.
+  * local에서 문서 생성 test -> [tox](https://pypi.python.org/pypi/tox) 명령어 사용 가능
+  * rst(restuctured text) -> python 기반 프로젝트에서 많이 사용(cf. markdown(*.md))
+    
+### tox
+  * using "virtualenv" (Python 가상 환경)
+  * .tox/[virtualenv name] 에 관련 파일 관리
+  * 만약 직접 사용하고 싶은 경우, `source .tox/[virtualenv name]`
+
+### [실습 1] training-guide -> 문서 빌드를 tox로 해 봅시다!
+ * Recent version: 2.5.0, Python 2.7 supported
+   *  ```# apt install python-pip```
+   * ```# apt install python-tox```
+     * cf. tox 버전이 낮아 build가 되지 않을 경우: ```sudo apt purge phthon-tox && sudo pip install tox```
+   * ```$ git clone git://git.openstack.org/openstack/training-guides```
+   * ```$ cd training-guides```
+     ```$ tox```
+   * tox.ini 안의 환경들 중에서 특정 환경만 실행 -> `tox -e [environment]`
+     * cf. [Building documentation](http://docs.openstack.org/contributor-guide/docs-builds.html)에서 Builds Workflow의 명령어 처럼 해당 환경만 build만 가능
+  ```$ tox -e build -- contributor-guide```
+    
+### [실습2] openstack-manuals에서 원하는 branch 및 매뉴얼을 선택해서 해당 branch에서 원하는 매뉴얼만 build 해보기
+ * git://git.openstack.org/openstack/openstack-manuals
+  ```$tox -e build -- ha-guide```
+
+### 오탈자 찾아내기
+ * ```$ aspell check [filename].rst```
+ * ```git checkout -b fix-typo```
+    * e.g) https://bugs.launchpad.net/openstack-manuals/+bug/1512551
+    * 주의 : training-guides의 경우 slide로 변환되는 특이 케이스이며, 80자가 넘을 경우 tox에서 build가 되지 않으므로 local에서 미리 build 해본다.
+    * 기타 규칙 : PEP8 / Hacking -> tox에서 build 할 때 검증함.
+
+### 기타
+  * POT 파일: 번역 파일의 원본과도 같은 파일
+  * 해당 문서 / 프로젝트에 기여하려면 : 해당 프로젝트의 컴파일이나 빌드에 대해 친숙
+  * 소통 : 메일링이나 IRC에서 자주 커뮤니케이션을 하는게 중요
+  * 2/11 upstream training -> https://openstack-kr.github.io/upstream-training
+
+### 과제
+1. Zanata 300단어 -> 하기
+2. Optional: 오타 찾아서 git review로 submission 해 보기
