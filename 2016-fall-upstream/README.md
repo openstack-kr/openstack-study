@@ -277,14 +277,14 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
      * cf. tox 버전이 낮아 build가 되지 않을 경우: ```sudo apt purge phthon-tox && sudo pip install tox```
    * ```$ git clone git://git.openstack.org/openstack/training-guides```
    * ```$ cd training-guides```
-     ```$ tox```
+   * ```$ tox```
    * tox.ini 안의 환경들 중에서 특정 환경만 실행 -> `tox -e [environment]`
      * cf. [Building documentation](http://docs.openstack.org/contributor-guide/docs-builds.html)에서 Builds Workflow의 명령어 처럼 해당 환경만 build만 가능
-  ```$ tox -e build -- contributor-guide```
+   * ```$ tox -e build -- contributor-guide```
     
 ### [실습2] openstack-manuals에서 원하는 branch 및 매뉴얼을 선택해서 해당 branch에서 원하는 매뉴얼만 build 해보기
- * git://git.openstack.org/openstack/openstack-manuals
-  ```$tox -e build -- ha-guide```
+ * `git clone -b [branch-name] git://git.openstack.org/openstack/openstack-manuals`
+ * ```$tox -e build -- ha-guide```
 
 ### 오탈자 찾아내기
  * ```$ aspell check [filename].rst```
