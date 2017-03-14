@@ -21,6 +21,7 @@
 * [3회차 스터디 내용](#20161220-3회차-스터디)
 * [4회차 스터디 내용](#20170110-4회차-스터디)
 * [5회차 스터디 내용](#20170124-5회차-스터디)
+* [6회차 스터디 내용](#20170207-6회차-스터디)
 
 ## 스터디 개요 (Overview)
 
@@ -302,3 +303,21 @@ ssh://janghe11@review.openstack.org:29418/openstack-dev/sandbox.git
 ### 과제
 1. Zanata 300단어 -> 하기
 2. Optional: 오타 찾아서 git review로 submission 해 보기
+
+## [2017/02/07] 6회차 스터디
+### Contribution 정리 보충
+ * GitHub은 Gerrit의 미러링 용
+ * Gerrit과 GitHub의 Email 명만 같으면 GitHub에 연동되어 나중에 나의 이력으로 나온다.
+   * GitHub에도 나의 commit 이력이 나오게 하고 싶으면 해당 project에 star를 눌러준다.
+ * git review -s -> git review의 연결 체크 + ChangeId를 자동으로 넣기 위함
+ * Launchpad에 Bug는 필수적으로 Reporting(workflow상 issue tracking을 위해)
+ * Related-Bug: -> 해당 버그가 다른 버그와 연관되었을 경우 명시
+ * Fixed Typo Commit e.g.) https://review.openstack.org/#/c/425529/
+
+### Openstack 기여 보충과 사례
+ * http://launchpad.net/openstack-manuals 에서 blueprint를 작성하고 project 시작
+   * http://specs.openstack.org/ 에서 각 프로젝트마다 spec이 명시되어 있다.
+   * 각 spec에 맞게 project를 작성하고 contriute를 하여야 한다.
+   * spec을 정하는 과정 e.g.) https://review.openstack.org/#/c/397098/
+   * docs에 필요한 tool(pdf)의 개발 과정 e.g.) https://review.openstack.org/#/c/410341/
+
