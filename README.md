@@ -13,3 +13,4 @@ The repository for study activities in OpenStack Korea User Group (오픈스택 
   (http://github.com/fuhaha/ansible_study)
 * [2016년 하반기-2017년 2월: 오픈스택 컨트리뷰션 스터디]
   (2016-fall-upstream)
+* [2017년 상반기 Openstack Swift 분석 스터디](2017-first-swift)
