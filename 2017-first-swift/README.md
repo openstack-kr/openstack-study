@@ -12,6 +12,7 @@
   * Openstack Swift 의 코드 구조와 내부 동작 원리를 파악한다.
   * Devstack 을 이용하여 Openstack 의 개발환경을 구성하는 방법과 디버깅 방법에 대해 학습한다.
   * IRC/gerrit 을 통해 Upstream 개발 현황을 파악한다.
+    * 스터디를 진행하다가, 버그 혹은 개선 할 점을 찾으면 contribution을 해본다
 
 * 진행 방법
   * 2주 단위로 진행되며, 2주를 1 sprint로 계산하여 진행한다.
@@ -20,6 +21,14 @@
 
 ## 스터디 내용
 내용은 스터디를 진행하면서 수정될 수 있습니다.
+
+### 알아볼 내용
+* Proxy/Account/Container/Object Server의 내부 동작 원리.
+  * 예: Object 는 어떤 과정을 통해 디스크에 저장될까?
+* Ring 빌드 과정 및 알고리즘.
+* Eventually Consistency 를 위해 실행하는 여러 데몬의 동작 원리. (ex: replicator)
+* 다양한 Middleware 를 분석을 통한, Custom Middleware 의 개발 방법.
+* Upstream 의 개발 현황
 
 ### 1일차
 * Openstack Swift 소개 및 프로젝트 이해
