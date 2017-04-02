@@ -26,7 +26,7 @@
 * Proxy/Account/Container/Object Server의 내부 동작 원리.
   * 예: Object 는 어떤 과정을 통해 디스크에 저장될까?
 * Ring 빌드 과정 및 알고리즘.
-* Eventually Consistency 를 위해 실행하는 여러 데몬의 동작 원리. (ex: replicator)
+* Eventually Consistent 를 위해 실행하는 여러 데몬의 동작 원리. (ex: replicator)
 * 다양한 Middleware 를 분석을 통한, Custom Middleware 의 개발 방법.
 * Upstream 의 개발 현황
 
