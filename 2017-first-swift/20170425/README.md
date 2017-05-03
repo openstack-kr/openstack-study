@@ -30,42 +30,42 @@
 #### Debug
 * /etc/swift : swift가 참조하는 script files의 경로
   * swift-init proxy stop : swift-proxy-server 서비스만 중지 -> 이후 PyCharm을 통해 구동하며 line by line으로 trace
-  ![swift-init_proxy_stop](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/swift-init_proxy_stop.png)
+  ![swift-init_proxy_stop](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/swift-init_proxy_stop.png)
   * /swift/bin/swift-proxy
 * Run -> Run swift-proxy-server -> Edit Configuration
   * Debug Configurations 창에서
     * Script parameters : /etc/swift/proxy-server.conf
     * Working directory : /home/jang/swift
     * Single instance only 체크
-    ![Debug Configuration](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/Debug_Configurations.png)
+    ![Debug Configuration](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/Debug_Configurations.png)
   * File -> Settings -> Python Debugger 창에서
     * Gevent Compatible 체크
     * PyQT Compatible 체크
-    ![Settings_Python_Debugger](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/Settings_Python_Debugger.png)
+    ![Settings_Python_Debugger](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/Settings_Python_Debugger.png)
   * Debug 시작
-  ![swift_bin_swift-proxy-server](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/swift_bin_swift-proxy-server.png)
+  ![swift_bin_swift-proxy-server](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/swift_bin_swift-proxy-server.png)
 #### Remote Debugging 설정
 * Virtualbox에서 호스트 전용 네트워크 생성 및 DHCP 서버 설정
-  ![virtualbox_dhcp](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/virtualbox_dhcp.png)
+  ![virtualbox_dhcp](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/virtualbox_dhcp.png)
 * 해당 VM에서 호스트 전용 어댑터 추가
-  ![virtualbox_network](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/virtualbox_network.png)
+  ![virtualbox_network](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/virtualbox_network.png)
 #### Middleware 분석하기
 * wsgi : web service gateway interface -> 내장 웹서버
 * tempauth 분석해보기
-  ![tempauth.py](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/tempauth.py.png)
+  ![tempauth.py](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/tempauth.py.png)
   * proxy-server를 디버깅 시작하고 breaking point를 찍었을때의 예시
-  ![server.py_break_point](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/server.py_break_point.png)
-  ![server.py_req_contents](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/server.py_req_contents.png)
+  ![server.py_break_point](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/server.py_break_point.png)
+  ![server.py_req_contents](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/server.py_req_contents.png)
   * def __call__(self, env, start_response): 시작 부분
     * env : 이전에 request를 통해 넘어온 data
     * start_response
   * return self.app(env, start_response)
 * Token 발급 테스트 : `curl -v -H 'X-Storage-User: test:tester' -H 'X-Storage-Pass: testing' http://127.0.0.1:8080/auth/v1.0`
-![Token_generation_test_001](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/Token_generation_test_001.png)
+![Token_generation_test_001](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/Token_generation_test_001.png)
   * Token 인증 확인
-    ![Token_generation_test_002](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/Token_generation_test_002.png)
+    ![Token_generation_test_002](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/Token_generation_test_002.png)
   * 해당 Token이 유효하지 않은 경우
-    ![Token_generation_test_fault](https://github.com/openstack-kr/openstack-study/tree/master/2017-first-swift/20170425/images/Token_generation_test_fault.png)
+    ![Token_generation_test_fault](https://github.com/openstack-kr/openstack-study/blob/master/2017-first-swift/20170425/images/Token_generation_test_fault.png)
 
 ## 과제
 * - middleware -
